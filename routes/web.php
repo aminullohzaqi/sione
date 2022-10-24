@@ -50,5 +50,6 @@ Route::post('/addserver', [AdminController::class, 'addServer'])->middleware(['a
 Route::post('/deleteserver', [AdminController::class, 'deleteServer'])->middleware(['auth', 'isAdmin']);
 
 Route::get('/formreport', [DashboardController::class, 'formReport']);
+Route::post('/generatereport', [DashboardController::class, 'generateReport']);
 
 // Route::get('/report/{date_start}/{date_end}/{servers}/{times}', [DashboardController::class, 'generateReport'])->middleware(['auth']);

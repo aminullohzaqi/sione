@@ -19,4 +19,13 @@ class Report extends Model
 
         return $operators;
     }
+
+    public static function getOperator($id) {
+        $operator = DB::table('operator')
+            ->select('nama')
+            ->where('id', '=', $id)
+            ->get();
+        
+        return $operator;
+    }
 }

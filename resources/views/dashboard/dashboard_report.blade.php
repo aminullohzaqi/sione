@@ -6,10 +6,11 @@
             <div class="col-md-10">
                 <div class="card">
                     <div class="card-body">
-                        <form action="/inputReport" method="post" enctype="multipart/data">
+                        <form action="/generatereport" method="post" enctype="multipart/form-data">
+                            {{ csrf_field() }}
                             <div class="form-group">
                                 <label for="petugas">Petugas Monitoring</label>
-                                <select class="form-select" id="petugas">
+                                <select class="form-select" id="petugas" name="operator">
                                     <option value="option_select" disabled selected>----Select Name----</option>
                                     @foreach ($operators as $operator)
                                         <option value="{{ $operator->id }}">{{ $operator->nama }}</option>
@@ -18,11 +19,11 @@
                             </div>
                             <br>
                             <div class="form-group">
-                                <label for="tangkapan_layar">Tangkapan Layar</label>
-                                <input type="file" class="form-control" id="tangkapan_layar" multiple>
+                                <label for="tangkapan_layar">Tangkapan Layar Dashboard SiOne</label>
+                                <input type="file" class="form-control" name="dashboard_SiOne">
                             </div>
                             <br>
-                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <button type="submit" class="btn btn-primary">Generate</button>
                         </form>
                     </div>
                 </div>

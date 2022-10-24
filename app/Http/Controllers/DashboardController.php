@@ -268,12 +268,6 @@ class DashboardController extends Controller
             $no = 1;
 
             foreach ($storages as $s) {
-                // $row = [];
-                // $row[] = $no++;
-                // $row[] = $s->description;
-                // $row[] = $s->uuid;
-                // $row[] = $s->brand;
-                // $data[] = $row; 
                 try {
                     if ($s->brand == '1') {
                         $response = Http::timeout(10)->withoutverifying()->withBasicAuth("moni", "Lihatsaja@1")->get('https://192.168.15.55/api/cluster/nodes/' . $s->uuid);
@@ -469,6 +463,104 @@ class DashboardController extends Controller
         $data['uri'] = 'report';
         $data['operators'] = $operators;
         return view('dashboard.dashboard_report', $data);
+    }
+
+    public function generateReport (Request $request) {
+        $form = $request->input();
+
+        $file = $request->file('dashboard_SiOne');
+        $file_name = $file->getClientOriginalName();
+        $tujuan_upload = 'data_file';
+        $file->move($tujuan_upload,$file_name);
+
+        $id_operator = $form['operator'];
+
+        $operator = Report::getOperator($id_operator);
+        $servers = Server::getAllServer();
+        $storages = Storage::getAllStorages();
+
+        $server_ilo = [];
+        $server_ipmi = [];
+        $server_xclarity = [];
+        $storage_netapp = [];
+        $no = 1;
+
+        foreach ($servers as $s) {
+            if ($s->type == '1') {
+                try {
+                    $response = Http::timeout(3)->withoutverifying()->withBasicAuth($s->username, $s->password)->get('http://' . $s->ip_address . '/json/health_summary');
+                    $response = $response->object();
+
+                    $row = [];
+                    $row[] = $no++;
+                    $row[] = $s->name;
+                    $row[] = $s->ip_address;
+                    $row[] = $response->hostpwr_state;
+                    $server_ilo[] = $row;
+                } catch (\Illuminate\Http\Client\ConnectionException $e) {
+                    $server_ilo = "Error";
+                } 
+            }
+
+            else if ($s->type == '2') {
+                try {
+                    $response = Http::timeout(3)->withoutverifying()->withBasicAuth($s->username, $s->password)->get('http://' . $s->ip_address . '/redfish/v1/Systems/1');
+
+                    $row = [];
+                    $row[] = $no++;
+                    $row[] = $s->name;
+                    $row[] = $s->ip_address;
+                    $row[] = strtoupper($response['PowerState']);
+                    $server_ipmi[] = $row;
+                } catch (\Illuminate\Http\Client\ConnectionException $e) {
+                    $server_ipmi = "Error";
+                }            
+            } 
+
+            else if ($s->type == '3') {
+                try {
+                    if ($s->type == '3') {
+                        $response = Http::timeout(10)->withoutverifying()->withBasicAuth($s->username, $s->password)->get('https://' . $s->ip_address . '/redfish/v1/Systems/1');
+
+                        $row = [];
+                        $row[] = $no++;
+                        $row[] = $s->name;
+                        $row[] = $s->ip_address;
+                        $row[] = $response['Status']['Health'];
+                        $server_xclarity[] = $row;
+                    }
+                } catch (\Illuminate\Http\Client\ConnectionException $e) {
+                    $server_xclarity = "Error";
+                }
+            } 
+        }
+
+        foreach ($storages as $s) {
+            if ($s->brand == '1') {
+                try {
+                    $response = Http::timeout(10)->withoutverifying()->withBasicAuth("moni", "Lihatsaja@1")->get('https://192.168.15.55/api/cluster/nodes/' . $s->uuid);
+                    // $response = $response->json();
+
+                    $row = [];
+                    $row[] = $no++;
+                    $row[] = $s->description;
+                    $row[] = $response['management_interfaces'][0]['ip']['address'];
+                    $row[] = strtoupper($response['state']);
+                    $storage_netapp[] = $row;
+                } catch (\Illuminate\Http\Client\ConnectionException $e) {
+                    $storage_netapp = "Error";
+                }
+            }
+        }
+
+        $data['operator'] = $operator;
+        $data['server_ilo'] = $server_ilo;
+        $data['server_ipmi'] = $server_ipmi;
+        $data['server_xclarity'] = $server_xclarity;
+        $data['storage_netapp'] = $storage_netapp;
+        $data['response'] = $response;
+        $data['file_name'] = $file_name;
+        return view('dashboard.dashboard_generate', $data);
     }
 
     // public function generateReport($date_start, $date_end, $servers, $times)
