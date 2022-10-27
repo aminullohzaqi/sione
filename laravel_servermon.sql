@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 27 Okt 2022 pada 11.31
+-- Waktu pembuatan: 27 Okt 2022 pada 15.16
 -- Versi server: 10.4.22-MariaDB
 -- Versi PHP: 8.1.1
 
@@ -104,7 +104,7 @@ INSERT INTO `servers` (`id`, `name`, `ip_address`, `username`, `password`, `desc
 (12, 'Dev Big Data', '192.168.15.47', 'moni', 'monitoring123!', 'Dev Big Data', '', 1, 1),
 (13, 'Dev Big Data', '192.168.15.48', 'moni', 'monitoring123!', 'Dev Big Data', '', 1, 1),
 (16, 'Dev Big Data', '192.168.15.59', 'moni', 'monitoring123!', 'Dev Big Data', '', 1, 1),
-(19, 'DC1-BCK01', '192.168.15.44', 'moni', 'monitoring123!', 'Host Backup HP Data Protector', '', 1, 1),
+(19, 'DC1-BCK01', '192.168.15.44', 'moni', 'monitoring123!', 'Host Backup HP Data Protector', 'Host Backup HP Data Protector', 1, 1),
 (21, 'FTP Backup AWS Center', '192.168.15.173', 'monitoring', 'Moni@bmkg123!', 'FTP Backup AWS Center', '', 1, 1),
 (23, 'Web Magnet', '192.168.15.171', 'monitoring', 'Moni@bmkg123!', 'Host Web Magnet', 'Server Web Magnet', 1, 1),
 (24, 'NUTANIX-A', '192.168.15.111', 'moni', 'monitoring123!', 'Sistem HCI Nutanix', 'Host Sistem HCI Nutanix (ntnx02A)', 2, 2),
@@ -113,7 +113,8 @@ INSERT INTO `servers` (`id`, `name`, `ip_address`, `username`, `password`, `desc
 (28, 'NTNX-1', '192.168.15.109', 'moni', 'monitoring123!', 'Sistem HCI Nutanix', 'Host Sistem HCI Nutanix (ntnx03A)', 2, 2),
 (37, 'NTNX-05A', '192.168.15.116', 'moni', 'monitoring123!', 'Sistem HCI Nutanix', 'Host Sistem HCI Nutanix (ntnx05A)', 2, 2),
 (38, 'AWS Center Portal', '192.168.15.71', 'monitoring', 'Moni@bmkg2022!', 'Server AWS Center Portal', 'AWS Center Portal', 3, 3),
-(39, 'AWS Center Processing & DB', '192.168.15.215', 'monitoring', 'Moni@bmkg123!', 'Server AWS Center Processing & DB', 'AWS Center Processing & DB', 1, 2);
+(39, 'AWS Center Processing & DB', '192.168.15.215', 'monitoring', 'Moni@bmkg123!', 'Server AWS Center Processing & DB', 'AWS Center Processing & DB', 1, 2),
+(40, 'NTNX-04A', '192.168.15.144', 'moni', 'monitoring123!', 'Host Sistem HCI Nutanix (ntnx04A)', 'Host Sistem HCI Nutanix (ntnx04A)', 2, 2);
 
 -- --------------------------------------------------------
 
@@ -849,7 +850,7 @@ ALTER TABLE `operator`
 -- AUTO_INCREMENT untuk tabel `servers`
 --
 ALTER TABLE `servers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT untuk tabel `servers_brand`

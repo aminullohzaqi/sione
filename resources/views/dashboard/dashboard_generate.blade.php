@@ -67,7 +67,7 @@
 				</tr>
                 @foreach ($server_ilo as $server)
                     <tr>
-                        <td width="80">1</td>
+                        <td width="80">{{ $server[0] }}</td>
                         <td width="80">{{ $server[1] }}</td>
                         <td width="80">{{ $server[2] }}</td>
                         <td width="80">{{ $server[3] }}</td>
@@ -76,7 +76,7 @@
                 @endforeach
                 @foreach ($server_ipmi as $server)
                     <tr>
-                        <td width="80">1</td>
+                        <td width="80">{{ $server[0] }}</td>
                         <td width="80">{{ $server[1] }}</td>
                         <td width="80">{{ $server[2] }}</td>
                         <td width="80">{{ $server[3] }}</td>
@@ -85,7 +85,7 @@
                 @endforeach
                 @foreach ($server_xclarity as $server)
                     <tr>
-                        <td width="80">1</td>
+                        <td width="80">{{ $server[0] }}</td>
                         <td width="80">{{ $server[1] }}</td>
                         <td width="80">{{ $server[2] }}</td>
                         <td width="80">{{ $server[3] }}</td>
@@ -118,20 +118,36 @@
                     </tr>   
                 @endforeach
 				<?php 
-					$url = 'http://172.19.3.246:8080/cgi-bin/management/manaRequest.cgi?subfunc=sysinfo&sysHealth=1&sid=nfbfg650';
-
-					$qnap = new SimpleXMLElement($url, null, true);
+					try {
+						$url_sid = 'http://172.19.3.246:8080/cgi-bin/authLogin.cgi?user=moni&pwd=bW9uaXRvcmluZzEyMyE=&remme=1';
+						$qnap_sid = new SimpleXMLElement($url_sid, null, true);
+	
+						$url = 'http://172.19.3.246:8080/cgi-bin/management/manaRequest.cgi?subfunc=sysinfo&sysHealth=1&sid=' . $qnap_sid->authSid;
+	
+						$qnap = new SimpleXMLElement($url, null, true);
+						$qnap_status = $qnap->func->ownContent->sysHealth->status;
+					} catch (Exception $e) {
+						$qnap_status = 'Error Getting Data';
+					}
 				?>
-                    <tr>
-                        <td width="80">1</td>
-                        <td width="80">ES1686DC</td>
-                        <td width="80"><?php 
-							if ($qnap->func->ownContent->sysHealth->status == "good") {
-								echo "Normal";
-							}?>
-						</td>
-                        <td width="80"></td>
-                    </tr>   
+                <tr>
+                    <td width="80">1</td>
+                    <td width="80"><?= 'QNap - ' . $qnap->hostname ?></td>
+                    <td width="80"><?php 
+						if ($qnap_status == "good") {
+							echo "Normal";
+						} else {
+							echo $qnap_status;
+						}?>
+					</td>
+                    <td width="80"></td>
+                </tr>  
+				<tr>
+                    <td width="80">1</td>
+                    <td width="80">Fujitsu</td>
+                    <td width="80">{{ $fujitsu_status }}</td>
+                    <td width="80"> </td>
+                </tr>    
 			</table>
 
 			<br>
@@ -144,10 +160,16 @@
 
 			<table border="1" style="text-align:center; font-size: 10px; margin-left: 100px">
 				<tr bgcolor="#666666">
-					<td width="80">No</td><td width="80">Nama Server</td><td width="80">Kondisi Operasional</td><td width="80">Keterangan</td>
+					<td width="80">No</td>
+					<td width="80">Nama Server</td>
+					<td width="80">Kondisi Operasional</td>
+					<td width="80">Keterangan</td>
 				</tr>
 				<tr>
-					<td width="80">1</td><td width="80"> </td><td width="80"> </td><td width="80"> </td>
+					<td width="80">1</td>
+					<td width="80">Infrastruktur Pusat Data Nasional (vcpu, memory, storage)</td>
+					<td width="80">Normal</td>
+					<td width="80">14 Aplikasi</td>
 				</tr>
 			</table>
 

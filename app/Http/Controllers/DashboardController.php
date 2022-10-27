@@ -11,7 +11,6 @@ use App\Models\Server;
 use App\Models\Storage;
 use App\Models\Report;
 use App\Models\ExportData;
-use PDF;
 
 
 class DashboardController extends Controller
@@ -535,6 +534,7 @@ class DashboardController extends Controller
     }
 
     public function generateReport (Request $request) {
+
         $form = $request->input();
 
         $file = $request->file('dashboard_SiOne');
@@ -543,11 +543,12 @@ class DashboardController extends Controller
         $file->move($tujuan_upload,$file_name);
 
         $id_operator = $form['operator'];
+        $fujitsu_status = $form['fujitsu_status'];
 
         $operator = Report::getOperator($id_operator);
         $servers = Server::getAllServer();
         $storages = Storage::getAllStorages();
-
+        
         $server_ilo = [];
         $server_ipmi = [];
         $server_xclarity = [];
@@ -620,7 +621,7 @@ class DashboardController extends Controller
 
                     $row = [];
                     $row[] = $no++;
-                    $row[] = $s->description;
+                    $row[] = 'NetApp - ' . $s->description;
                     $row[] = $response['management_interfaces'][0]['ip']['address'];
                     if ($response['state'] == 'up') {
                         $row[] = "Normal";
@@ -633,37 +634,6 @@ class DashboardController extends Controller
                     $storage_netapp = "Error";
                 }
             }
-
-            // else if ($s->brand == '2') {
-            //     try {
-            //         $qnap_sid = 'nfbfg650';
-
-            //         // $response_data = Http::timeout(10)->withoutverifying()->get('http://' . $s->uuid . ':8080/cgi-bin/management/manaRequest.cgi?subfunc=sysinfo&sysHealth=1&sid=' . $qnap_sid);
-            //         // // $response = $response->json();
-
-            //         $response_data = 'http://' . $s->uuid . ':8080/cgi-bin/management/manaRequest.cgi?subfunc=sysinfo&sysHealth=1&sid=' . $qnap_sid;
-
-            //         $xml = file_get_contents($response_data);
-
-            //         $xml_data = simplexml_load_string($xml);
-            //         $json = json_encode($xml_data);
-            //         $result = json_decode($json, true);
-
-            //         $row = [];
-            //         $row[] = $no++;
-            //         $row[] = $s->description;
-            //         $row[] = $s->uuid;
-            //         $row[] = $result['func']['ownContent']['sysHealth']['status'];
-            //         // if ($result['func']['ownContent']['sysHealth']['status'] == 'good') {
-            //         //     $row[] = "Normal";
-            //         // } else {
-            //         //     $row[] = "Bermasalah";
-            //         // }
-            //         $storage_qnap[] = $row;
-            //     } catch (\Illuminate\Http\Client\ConnectionException $e) {
-            //         $storage_qnap = "Error";
-            //     }
-            // }
         }
 
         $date_parse = explode("T", $date);
@@ -679,6 +649,7 @@ class DashboardController extends Controller
         // $data['storage_qnap'] = $storage_qnap;
         $data['response'] = $response;
         $data['file_name'] = $file_name;
+        $data['fujitsu_status'] = $fujitsu_status;
         $data['tanggal'] = $tanggal;
         $data['jam'] = $jam;
         return view('dashboard.dashboard_generate', $data);

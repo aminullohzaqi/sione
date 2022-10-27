@@ -28,7 +28,7 @@ class Server extends Model
     {
         $servers = DB::table('servers')
             ->select('name','ip_address', 'servers.id as serverid', 'type', 'username', 'password', 'name_report')
-            ->orderBy('name')
+            ->orderBy('brand')
             ->get();
 
         return $servers;

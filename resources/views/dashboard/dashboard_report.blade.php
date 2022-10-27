@@ -18,6 +18,20 @@
                                 </select>
                             </div>
                             <br>
+                            <label>Fujitsu</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" value="Normal" name="fujitsu_status" id="fujitsu_normal" checked>
+                                <label class="form-check-label" for="fujitsu_bermasalah">
+                                    Normal
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" value="Bermasalah" name="fujitsu_status" id="fujitsu_bermasalah">
+                                <label class="form-check-label" for="fujitsu_bermasalah">
+                                    Bermasalah
+                                </label>
+                            </div>
+                            <br>
                             <div class="form-group">
                                 <label for="tangkapan_layar">Tangkapan Layar Dashboard SiOne</label>
                                 <input type="file" class="form-control" name="dashboard_SiOne">
