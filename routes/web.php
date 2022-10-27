@@ -24,6 +24,7 @@ Route::post('/getsummaryilo', [DashboardController::class, 'getSummaryIlo'])->mi
 Route::post('/getsummaryipmi', [DashboardController::class, 'getSummaryIpmi'])->middleware('auth');
 Route::post('/getsummaryxclarity', [DashboardController::class, 'getSummaryXclarity'])->middleware('auth');
 Route::post('/getsummarynetapp', [DashboardController::class, 'getSummaryNetapp'])->middleware('auth');
+Route::post('/getsummaryqnap', [DashboardController::class, 'getSummaryQnap'])->middleware('auth');
 
 Route::get('/export', [DashboardController::class, 'export'])->middleware('auth');
 Route::post('/exportdata', [DashboardController::class, 'exportData'])->middleware(['auth']);

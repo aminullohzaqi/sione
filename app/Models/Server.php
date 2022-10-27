@@ -27,7 +27,7 @@ class Server extends Model
     public static function getAllServer()
     {
         $servers = DB::table('servers')
-            ->select('name','ip_address', 'servers.id as serverid', 'type', 'username', 'password')
+            ->select('name','ip_address', 'servers.id as serverid', 'type', 'username', 'password', 'name_report')
             ->orderBy('name')
             ->get();
 

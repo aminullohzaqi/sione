@@ -236,6 +236,69 @@
         </div>
     @endif
 
+    @if ($qnap == true)
+        <div class="page-body">
+            <div class="container-xl">
+                <div class="row row-deck row-cards">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="col">
+                                    <h3 class="align-items-start card-title">QNap</h3>
+                                </div>
+                                <div class="col text-end">
+                                    <button type="button" id="refresh_qnap" class=" align-items-end btn btn-sm btn-outline-success align-items-center"><span>
+                                            <!-- Download SVG icon from http://tabler-icons.io/i/refresh -->
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" />
+                                                <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" />
+                                            </svg>
+                                        </span>Refresh Data</button>
+                                </div>
+                            </div>
+                            <div class="table-responsive-md">
+                                <table id="qnap_table" class="table card-table table-vcenter datatable">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:5%">No.</th>
+                                            <th style="width:20%">Storage</th>
+                                            <th style="width:20%">Alamat IP</th>
+                                            <th style="width:20%">Health Summary</th>
+                                            <th style="width:15%">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php 
+                                            $url_sid = 'http://172.19.3.246:8080/cgi-bin/authLogin.cgi?user=moni&pwd=bW9uaXRvcmluZzEyMyE=&remme=1';
+
+                                            $qnap_sid = new SimpleXMLElement($url_sid, null, true);
+                                            $sid = $qnap_sid->authSid;
+
+                                            $url_data = 'http://172.19.3.246:8080/cgi-bin/management/manaRequest.cgi?subfunc=sysinfo&sysHealth=1&sid=' . $sid;
+
+                                            $qnap_data = new SimpleXMLElement($url_data, null, true);
+                                        ?>
+                                        <tr>
+                                            <td>1</td>
+                                            <td>ES1686dc</td>
+                                            <td>172.19.3.246</td>
+                                            <td><?php 
+                                                if ($qnap_data->func->ownContent->sysHealth->status == "good") {
+                                                    echo "<span class=\"badge bg-success me-1\"></span>OK";
+                                                } ?>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <!-- Modal -->
     <div class=" modal modal-blur fade" id="modal-simple" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
@@ -462,6 +525,45 @@
             $("#refresh_netapp").click(function() {
                 netapp.ajax.reload();
             });
+
+            // let qnap = $('#qnap_table').DataTable({
+            //     columnDefs: [{
+            //         "searchable": false,
+            //         "orderable": false,
+            //         "targets": [0, 4],
+            //     }],
+            //     order: [
+            //         [1, "asc"]
+            //     ],
+            //     paging: false,
+            //     searching: false,
+            //     bInfo: false,
+            //     ajax: {
+            //         'headers': {
+            //             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            //         },
+            //         'url': '/getsummaryqnap',
+            //         'type': 'POST',
+            //         "data": function(data) {
+            //             data.id = {{ $session_id }}
+            //         }
+            //     },
+            //     processing: true,
+            //     serverSide: false,
+            // });
+
+            // qnap.on('order.dt search.dt', function() {
+            //     qnap.column(0, {
+            //         search: 'applied',
+            //         order: 'applied'
+            //     }).nodes().each(function(cell, i) {
+            //         cell.innerHTML = i + 1;
+            //     });
+            // }).draw();
+
+            // $("#refresh_qnap").click(function() {
+            //     qnap.ajax.reload();
+            // });
         });
     </script>
 @endsection

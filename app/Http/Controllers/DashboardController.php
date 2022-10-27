@@ -42,6 +42,7 @@ class DashboardController extends Controller
         $ipmi = false;
         $xclarity = false;
         $netapp = true;
+        $qnap = true;
 
         foreach ($servers as $t) {
             if ($t->type == '1') {
@@ -57,6 +58,7 @@ class DashboardController extends Controller
         $data['ipmi'] = $ipmi;
         $data['xclarity'] = $xclarity;
         $data['netapp'] = $netapp;
+        $data['qnap'] = $qnap;
         $data['session_id'] = $id;
         $request->session()->put('role', $role->role);
 
@@ -313,6 +315,73 @@ class DashboardController extends Controller
         // return $data;
     }
 
+    public function getSummaryQnap(Request $request)
+    {   
+        $id = $request->id;
+
+        if ($request->ajax()) {
+
+            $storages = Storage::getAllStorages();
+
+            $data = [];
+            $no = 1;
+
+            foreach ($storages as $s) {
+                try {
+                    if ($s->brand == '2') {
+                        $qnap_sid = 'hxbcow5d';
+
+
+                        if ($qnap_sid !== null) {
+                            $response_data = Http::timeout(10)->withoutverifying()->get('http://' . $s->uuid . ':8080/cgi-bin/management/manaRequest.cgi?subfunc=sysinfo&sysHealth=1&sid=' . $qnap_sid);
+                            // $response_data = 'http://' . $s->uuid . '/cgi-bin/management/manaRequest.cgi?subfunc=sysinfo&sysHealth=1&sid=' . $qnap_sid;
+
+                            $xml_data = simplexml_load_string($response_data);
+                            $json = json_encode($xml_data);
+                            $result = json_decode($json, true);
+
+                            $row = [];
+                            $row[] = $no++;
+                            $row[] = "<span data-bs-toggle=\"tooltip\" data-bs-placement=\"top\" title=\"$s->description\">$s->description</span>";
+                            $row[] = $s->uuid;
+                            if ($result['func']['ownContent']['sysHealth']['status'] == 'good') {
+                                $row[] = "<span class=\"badge bg-success me-1\"></span>GOOD";
+                            } else {
+                                $row[] = "<span class=\"badge bg-danger me-1\"></span>N/A" . strtoupper($result['func']['ownContent']['sysHealth']['status']);
+                            }
+                            $row[] = "<a class=\"btn btn-outline-primary btn-sm\" href=\"https://192.168.15.55\">
+                            <span><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"icon\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" stroke-width=\"2\" stroke=\"currentColor\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path stroke=\"none\" d=\"M0 0h24v24H0z\" fill=\"none\"/><line x1=\"5\" y1=\"12\" x2=\"19\" y2=\"12\" /><line x1=\"15\" y1=\"16\" x2=\"19\" y2=\"12\" /><line x1=\"15\" y1=\"8\" x2=\"19\" y2=\"12\" /></svg></span>
+                            Go to QNap</a>";
+                            $data[] = $row;
+                        }
+                       
+                    }
+                } catch (\Illuminate\Http\Client\ConnectionException $e) {
+                    $row = [];
+                    $row[] = $no++;
+                    $row[] = "<span data-bs-toggle=\"tooltip\" data-bs-placement=\"top\" title=\"$s->description\">$s->description</span>";
+                    $row[] = "<a href=\"http://$s->description\">$s->description</a>";
+                    $row[] = "<span class=\"badge bg-secondary me-1\"></span>Failed";
+                    $row[] = "<span class=\"badge bg-secondary me-1\"></span>Failed";
+                    $row[] = "<a class=\"btn btn-outline-primary btn-sm\" href=\"http://$s->description\">
+                        <span><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"icon\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" stroke-width=\"2\" stroke=\"currentColor\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path stroke=\"none\" d=\"M0 0h24v24H0z\" fill=\"none\"/><line x1=\"5\" y1=\"12\" x2=\"19\" y2=\"12\" /><line x1=\"15\" y1=\"16\" x2=\"19\" y2=\"12\" /><line x1=\"15\" y1=\"8\" x2=\"19\" y2=\"12\" /></svg></span>
+                        Go to Qnap</a>";
+                    $data[] = $row;
+                }
+            }
+
+            $output = [
+                "draw" => $request->draw,
+                "recordsTotal" => $no,
+                "recordsFiltered" => $no,
+                "data" => $data
+            ];
+            echo json_encode($output);
+            
+        }
+        // return $data;
+    }
+
     public function getStatus(Request $request)
     {
         $serverid = $request->serverid;
@@ -483,54 +552,62 @@ class DashboardController extends Controller
         $server_ipmi = [];
         $server_xclarity = [];
         $storage_netapp = [];
+        // $storage_qnap = [];
+        $date = null;
         $no = 1;
 
         foreach ($servers as $s) {
             if ($s->type == '1') {
-                try {
-                    $response = Http::timeout(3)->withoutverifying()->withBasicAuth($s->username, $s->password)->get('http://' . $s->ip_address . '/json/health_summary');
-                    $response = $response->object();
-
-                    $row = [];
-                    $row[] = $no++;
-                    $row[] = $s->name;
-                    $row[] = $s->ip_address;
-                    $row[] = $response->hostpwr_state;
-                    $server_ilo[] = $row;
-                } catch (\Illuminate\Http\Client\ConnectionException $e) {
-                    $server_ilo = "Error";
-                } 
+                if ($s->name_report != null) {
+                    try {
+                        $response = Http::timeout(3)->withoutverifying()->withBasicAuth($s->username, $s->password)->get('http://' . $s->ip_address . '/json/health_summary');
+                        $response = $response->object();
+    
+                        $row = [];
+                        $row[] = $no++;
+                        $row[] = $s->name_report;
+                        $row[] = $response->hostpwr_state;
+                        $row[] = explode('_', $response->system_health)[2];
+                        $server_ilo[] = $row;
+                    } catch (\Illuminate\Http\Client\ConnectionException $e) {
+                        $server_ilo = "Error";
+                    } 
+                }
             }
 
             else if ($s->type == '2') {
-                try {
-                    $response = Http::timeout(3)->withoutverifying()->withBasicAuth($s->username, $s->password)->get('http://' . $s->ip_address . '/redfish/v1/Systems/1');
-
-                    $row = [];
-                    $row[] = $no++;
-                    $row[] = $s->name;
-                    $row[] = $s->ip_address;
-                    $row[] = strtoupper($response['PowerState']);
-                    $server_ipmi[] = $row;
-                } catch (\Illuminate\Http\Client\ConnectionException $e) {
-                    $server_ipmi = "Error";
-                }            
+                if ($s->name_report != null) {
+                    try {
+                        $response = Http::timeout(3)->withoutverifying()->withBasicAuth($s->username, $s->password)->get('http://' . $s->ip_address . '/redfish/v1/Systems/1');
+    
+                        $row = [];
+                        $row[] = $no++;
+                        $row[] = $s->name_report;
+                        $row[] = strtoupper($response['PowerState']);
+                        $row[] = $response['Status']['Health'];
+                        $server_ipmi[] = $row;
+                    } catch (\Illuminate\Http\Client\ConnectionException $e) {
+                        $server_ipmi = "Error";
+                    }            
+                }
             } 
 
             else if ($s->type == '3') {
-                try {
-                    if ($s->type == '3') {
-                        $response = Http::timeout(10)->withoutverifying()->withBasicAuth($s->username, $s->password)->get('https://' . $s->ip_address . '/redfish/v1/Systems/1');
-
-                        $row = [];
-                        $row[] = $no++;
-                        $row[] = $s->name;
-                        $row[] = $s->ip_address;
-                        $row[] = $response['Status']['Health'];
-                        $server_xclarity[] = $row;
+                if ($s->name_report != null) {
+                    try {
+                        if ($s->type == '3') {
+                            $response = Http::timeout(10)->withoutverifying()->withBasicAuth($s->username, $s->password)->get('https://' . $s->ip_address . '/redfish/v1/Systems/1');
+    
+                            $row = [];
+                            $row[] = $no++;
+                            $row[] = $s->name_report;
+                            $row[] = strtoupper($response['PowerState']);
+                            $row[] = $response['Status']['Health'];
+                            $server_xclarity[] = $row;
+                        }
+                    } catch (\Illuminate\Http\Client\ConnectionException $e) {
+                        $server_xclarity = "Error";
                     }
-                } catch (\Illuminate\Http\Client\ConnectionException $e) {
-                    $server_xclarity = "Error";
                 }
             } 
         }
@@ -545,21 +622,65 @@ class DashboardController extends Controller
                     $row[] = $no++;
                     $row[] = $s->description;
                     $row[] = $response['management_interfaces'][0]['ip']['address'];
-                    $row[] = strtoupper($response['state']);
+                    if ($response['state'] == 'up') {
+                        $row[] = "Normal";
+                    } else {
+                        $row[] = "Bermasalah";
+                    }
+                    $date = $response['date'];
                     $storage_netapp[] = $row;
                 } catch (\Illuminate\Http\Client\ConnectionException $e) {
                     $storage_netapp = "Error";
                 }
             }
+
+            // else if ($s->brand == '2') {
+            //     try {
+            //         $qnap_sid = 'nfbfg650';
+
+            //         // $response_data = Http::timeout(10)->withoutverifying()->get('http://' . $s->uuid . ':8080/cgi-bin/management/manaRequest.cgi?subfunc=sysinfo&sysHealth=1&sid=' . $qnap_sid);
+            //         // // $response = $response->json();
+
+            //         $response_data = 'http://' . $s->uuid . ':8080/cgi-bin/management/manaRequest.cgi?subfunc=sysinfo&sysHealth=1&sid=' . $qnap_sid;
+
+            //         $xml = file_get_contents($response_data);
+
+            //         $xml_data = simplexml_load_string($xml);
+            //         $json = json_encode($xml_data);
+            //         $result = json_decode($json, true);
+
+            //         $row = [];
+            //         $row[] = $no++;
+            //         $row[] = $s->description;
+            //         $row[] = $s->uuid;
+            //         $row[] = $result['func']['ownContent']['sysHealth']['status'];
+            //         // if ($result['func']['ownContent']['sysHealth']['status'] == 'good') {
+            //         //     $row[] = "Normal";
+            //         // } else {
+            //         //     $row[] = "Bermasalah";
+            //         // }
+            //         $storage_qnap[] = $row;
+            //     } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            //         $storage_qnap = "Error";
+            //     }
+            // }
         }
+
+        $date_parse = explode("T", $date);
+        $tanggal = $date_parse[0];
+        $jam_parse = explode("+", $date_parse[1]);
+        $jam = $jam_parse[0];
 
         $data['operator'] = $operator;
         $data['server_ilo'] = $server_ilo;
         $data['server_ipmi'] = $server_ipmi;
         $data['server_xclarity'] = $server_xclarity;
         $data['storage_netapp'] = $storage_netapp;
+        // $data['storage_qnap'] = $storage_qnap;
         $data['response'] = $response;
         $data['file_name'] = $file_name;
+        $data['tanggal'] = $tanggal;
+        $data['jam'] = $jam;
         return view('dashboard.dashboard_generate', $data);
     }
 

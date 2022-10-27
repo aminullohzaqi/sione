@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 21 Okt 2022 pada 09.27
+-- Waktu pembuatan: 27 Okt 2022 pada 11.31
 -- Versi server: 10.4.22-MariaDB
 -- Versi PHP: 8.1.1
 
@@ -83,6 +83,7 @@ CREATE TABLE `servers` (
   `username` varchar(50) DEFAULT NULL,
   `password` varchar(50) DEFAULT NULL,
   `description` varchar(255) DEFAULT NULL,
+  `name_report` varchar(255) NOT NULL,
   `brand` int(11) NOT NULL,
   `type` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -91,28 +92,28 @@ CREATE TABLE `servers` (
 -- Dumping data untuk tabel `servers`
 --
 
-INSERT INTO `servers` (`id`, `name`, `ip_address`, `username`, `password`, `description`, `brand`, `type`) VALUES
-(1, 'ESX-01', '192.168.15.41', 'moni', 'monitoring123!', 'Host Virtualisasi', 1, 1),
-(2, 'ESX-02', '192.168.15.42', 'moni', 'monitoring123!', 'Host Virtualisasi', 1, 1),
-(3, 'ESX-03', '192.168.15.43', 'moni', 'monitoring123!', 'Host Virtualisasi', 1, 1),
-(4, 'BMKGSOFT-DB', '192.168.15.50', 'moni', 'monitoring123!', 'DB Oracle BMKGSOFT', 1, 1),
-(7, 'NUTANIX-1', '192.168.15.85', 'moni', 'monitoring123!', 'Sistem HCI Nutanix', 2, 2),
-(8, 'NUTANIX-2', '192.168.15.86', 'moni', 'monitoring123!', 'Sistem HCI Nutanix', 2, 2),
-(9, 'NUTANIX-3', '192.168.15.87', 'moni', 'monitoring123!', 'Sistem HCI Nutanix', 2, 2),
-(11, 'Dev Big Data', '192.168.15.46', 'moni', 'monitoring123!', 'Dev Big Data', 1, 1),
-(12, 'Dev Big Data', '192.168.15.47', 'moni', 'monitoring123!', 'Dev Big Data', 1, 1),
-(13, 'Dev Big Data', '192.168.15.48', 'moni', 'monitoring123!', 'Dev Big Data', 1, 1),
-(16, 'Dev Big Data', '192.168.15.59', 'moni', 'monitoring123!', 'Dev Big Data', 1, 1),
-(19, 'DC1-BCK01', '192.168.15.44', 'moni', 'monitoring123!', 'Host Backup HP Data Protector', 1, 1),
-(21, 'FTP Backup AWS Center', '192.168.15.173', 'monitoring', 'Moni@bmkg123!', 'FTP Backup AWS Center', 1, 1),
-(23, 'Web Magnet', '192.168.15.171', 'monitoring', 'Moni@bmkg123!', 'Host Web Magnet', 1, 1),
-(24, 'NUTANIX-A', '192.168.15.111', 'moni', 'monitoring123!', 'Sistem HCI Nutanix', 2, 2),
-(25, 'NUTANIX-B', '192.168.15.112', 'moni', 'monitoring123!', 'Sistem HCI Nutanix', 2, 2),
-(27, 'NUTANIX-C', '192.168.15.113', 'moni', 'monitoring123!', 'Sistem HCI Nutanix', 2, 2),
-(28, 'NTNX-1', '192.168.15.109', 'moni', 'monitoring123!', 'Sistem HCI Nutanix', 2, 2),
-(37, 'NTNX-05A', '192.168.15.116', 'moni', 'monitoring123!', 'Sistem HCI Nutanix', 2, 2),
-(38, 'AWS Center Portal', '192.168.15.71', 'monitoring', 'Moni@bmkg123!', 'Server AWS Center Portal', 3, 3),
-(39, 'AWS Center Processing & DB', '192.168.15.215', 'monitoring', 'Moni@bmkg123!', 'Server AWS Center Processing & DB', 1, 2);
+INSERT INTO `servers` (`id`, `name`, `ip_address`, `username`, `password`, `description`, `name_report`, `brand`, `type`) VALUES
+(1, 'ESX-01', '192.168.15.41', 'moni', 'monitoring123!', 'Host Virtualisasi', 'Host Sistem Virtualisasi (ESX-01)', 1, 1),
+(2, 'ESX-02', '192.168.15.42', 'moni', 'monitoring123!', 'Host Virtualisasi', 'Host Sistem Virtualisasi (ESX-02)', 1, 1),
+(3, 'ESX-03', '192.168.15.43', 'moni', 'monitoring123!', 'Host Virtualisasi', 'Host Sistem Virtualisasi (ESX-03)', 1, 1),
+(4, 'BMKGSOFT-DB', '192.168.15.50', 'moni', 'monitoring123!', 'DB Oracle BMKGSOFT', 'Database Oracle BMKG Soft', 1, 1),
+(7, 'NUTANIX-1', '192.168.15.85', 'moni', 'monitoring123!', 'Sistem HCI Nutanix', 'Host Sistem HCI Nutanix (ntnx01A)', 2, 2),
+(8, 'NUTANIX-2', '192.168.15.86', 'moni', 'monitoring123!', 'Sistem HCI Nutanix', 'Host Sistem HCI Nutanix (ntnx01B)', 2, 2),
+(9, 'NUTANIX-3', '192.168.15.87', 'moni', 'monitoring123!', 'Sistem HCI Nutanix', 'Host Sistem HCI Nutanix (ntnx01C)', 2, 2),
+(11, 'Dev Big Data', '192.168.15.46', 'moni', 'monitoring123!', 'Dev Big Data', '', 1, 1),
+(12, 'Dev Big Data', '192.168.15.47', 'moni', 'monitoring123!', 'Dev Big Data', '', 1, 1),
+(13, 'Dev Big Data', '192.168.15.48', 'moni', 'monitoring123!', 'Dev Big Data', '', 1, 1),
+(16, 'Dev Big Data', '192.168.15.59', 'moni', 'monitoring123!', 'Dev Big Data', '', 1, 1),
+(19, 'DC1-BCK01', '192.168.15.44', 'moni', 'monitoring123!', 'Host Backup HP Data Protector', '', 1, 1),
+(21, 'FTP Backup AWS Center', '192.168.15.173', 'monitoring', 'Moni@bmkg123!', 'FTP Backup AWS Center', '', 1, 1),
+(23, 'Web Magnet', '192.168.15.171', 'monitoring', 'Moni@bmkg123!', 'Host Web Magnet', 'Server Web Magnet', 1, 1),
+(24, 'NUTANIX-A', '192.168.15.111', 'moni', 'monitoring123!', 'Sistem HCI Nutanix', 'Host Sistem HCI Nutanix (ntnx02A)', 2, 2),
+(25, 'NUTANIX-B', '192.168.15.112', 'moni', 'monitoring123!', 'Sistem HCI Nutanix', 'Host Sistem HCI Nutanix (ntnx02B)', 2, 2),
+(27, 'NUTANIX-C', '192.168.15.113', 'moni', 'monitoring123!', 'Sistem HCI Nutanix', 'Host Sistem HCI Nutanix (ntnx02C)', 2, 2),
+(28, 'NTNX-1', '192.168.15.109', 'moni', 'monitoring123!', 'Sistem HCI Nutanix', 'Host Sistem HCI Nutanix (ntnx03A)', 2, 2),
+(37, 'NTNX-05A', '192.168.15.116', 'moni', 'monitoring123!', 'Sistem HCI Nutanix', 'Host Sistem HCI Nutanix (ntnx05A)', 2, 2),
+(38, 'AWS Center Portal', '192.168.15.71', 'monitoring', 'Moni@bmkg2022!', 'Server AWS Center Portal', 'AWS Center Portal', 3, 3),
+(39, 'AWS Center Processing & DB', '192.168.15.215', 'monitoring', 'Moni@bmkg123!', 'Server AWS Center Processing & DB', 'AWS Center Processing & DB', 1, 2);
 
 -- --------------------------------------------------------
 
@@ -620,7 +621,8 @@ CREATE TABLE `storages` (
 
 INSERT INTO `storages` (`id`, `uuid`, `description`, `brand`) VALUES
 (1, '5a610fca-9437-11ea-bdf6-d039ea1722ff', 'BMKGJKTCL-01', 1),
-(2, '5ad8250f-9437-11ea-a85e-d039ea171364', 'BMKGJKTCL-02', 1);
+(2, '5ad8250f-9437-11ea-a85e-d039ea171364', 'BMKGJKTCL-02', 1),
+(5, '172.19.3.246', 'ES1686dc', 2);
 
 -- --------------------------------------------------------
 
@@ -750,8 +752,7 @@ INSERT INTO `user_server_permission` (`userid`, `serverid`) VALUES
 (13, 24),
 (13, 25),
 (13, 27),
-(13, 23),
-(1, 7);
+(13, 23);
 
 --
 -- Indexes for dumped tables
@@ -866,7 +867,7 @@ ALTER TABLE `servers_type`
 -- AUTO_INCREMENT untuk tabel `storages`
 --
 ALTER TABLE `storages`
-  MODIFY `id` int(2) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(2) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT untuk tabel `storages_brand`
